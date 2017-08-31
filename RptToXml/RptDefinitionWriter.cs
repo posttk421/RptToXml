@@ -536,7 +536,7 @@ namespace RptToXml
 							if (!pv.IsRange)
 							{
 								ParameterDiscreteValue pdv = (ParameterDiscreteValue)pv;
-								writer.WriteAttributeString("Value", pdv.Value.ToString());
+								writer.WriteAttributeString("Value", pdv.Value?.ToString());
 							}
 							writer.WriteEndElement();
 						}
