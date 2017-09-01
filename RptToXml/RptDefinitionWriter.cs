@@ -93,7 +93,6 @@ namespace RptToXml
 			{
 				Trace.WriteLine("Writing header info");
 
-				writer.WriteAttributeString("FileName", report.FileName.Replace("rassdk://", ""));
 				writer.WriteAttributeString("HasSavedData", report.HasSavedData.ToString());
 
 				if (_oleCompoundFile != null)
