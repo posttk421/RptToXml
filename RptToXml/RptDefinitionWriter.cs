@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -26,16 +27,24 @@ namespace RptToXml
 		private ISCDReportClientDocument _rcd;
 		private CompoundFile _oleCompoundFile;
 
+		private readonly string _tmpFilePath;
+		private readonly Stream _tmpFileStream;
 		private readonly bool _createdReport;
 
 		public RptDefinitionWriter(string filename)
 		{
 			_createdReport = true;
 			_report = new ReportDocument();
-			_report.Load(filename, OpenReportMethod.OpenReportByTempCopy);
+			_tmpFilePath = Path.GetTempPath() + Guid.NewGuid() + ".rpt";
+
+			File.Copy(filename, _tmpFilePath, false);
+
+			_report.Load(_tmpFilePath, OpenReportMethod.OpenReportByDefault);
+			_report.Refresh();
 			_rcd = _report.ReportClientDocument;
 
-			_oleCompoundFile = new CompoundFile(filename);
+			_tmpFileStream = new FileStream(_tmpFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			_oleCompoundFile = new CompoundFile(_tmpFileStream );
 
 			Trace.WriteLine("Loaded report");
 		}
@@ -957,6 +966,9 @@ namespace RptToXml
 					((IDisposable)_oleCompoundFile).Dispose();
 					_oleCompoundFile = null;
 				}
+
+				_tmpFileStream?.Dispose();
+				File.Delete(_tmpFilePath);
 			}
 		}
 	}
